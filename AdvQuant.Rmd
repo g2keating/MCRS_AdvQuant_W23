@@ -45,11 +45,8 @@ Spring_Data_raw <- Spring_Data_raw %>% row_to_names(row_number(1)) %>%
 
 
 
-
+# Standardize Code Names
 ```{r}
-print("This is a test")
-## hello this is Emma
-## another test
-## hello, the earth is round
+CodeCategories <- unique(Spring_Data_raw$Code)
 ```
 
