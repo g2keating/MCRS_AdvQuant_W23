@@ -20,6 +20,12 @@ library(janitor)
 
 ```
 
+Import Data
+```{r}
+Spring_2020_Percent_Cover_Raw_Data <- read_excel("Spring 2020 - Percent Cover - Raw Data DNET.xlsx", sheet = "Sheet1")
+
+```
+
 
 ```{r}
 print("This is a test")
