@@ -9,6 +9,8 @@ date: "2023-01-10"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+Load Packages
 ```{r}
 install.packages("tidyverse")
 install.packages("readxl")
@@ -22,8 +24,20 @@ library(janitor)
 
 Import Data
 ```{r}
-Spring_2020_Percent_Cover_Raw_Data <- read_excel("Spring 2020 - Percent Cover - Raw Data DNET.xlsx", sheet = "Sheet1")
+Spring_2020_Percent_Cover_Raw_Data <- read_excel("Spring 2020 - Percent Cover - Raw Data DNET.xlsx", sheet = "Sheet1", col_names = FALSE)
 
+glimpse(Spring_2020_Percent_Cover_Raw_Data)
+```
+
+Name columns after a row
+```{r}
+Spring_2020_Percent_Cover_Raw_Data <- Spring_2020_Percent_Cover_Raw_Data %>% row_to_names(row_number(1))
+```
+
+
+Rename Col Names
+```{r}
+Spring_2020_Percent_Cover_Raw_Data <- Spring_2020_Percent_Cover_Raw_Data %>%  rename(Transect = `Transect #`,  Hits = `# Hits`)
 ```
 
 
