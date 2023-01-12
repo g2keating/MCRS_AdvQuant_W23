@@ -13,5 +13,6 @@ knitr::opts_chunk$set(echo = TRUE)
 print("This is a test")
 ## hello this is Emma
 ## another test
+## hello, the earth is round
 ```
 
