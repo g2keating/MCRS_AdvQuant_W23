@@ -10,6 +10,18 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+install.packages("tidyverse")
+install.packages("readxl")
+install.packages("janitor")
+
+library(tidyverse)
+library(readxl)
+library(janitor)
+
+```
+
+
+```{r}
 print("This is a test")
 ## hello this is Emma
 ## another test
