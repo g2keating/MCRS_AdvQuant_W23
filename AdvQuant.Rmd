@@ -24,21 +24,26 @@ library(janitor)
 
 Import Data
 ```{r}
-Spring_2020_Percent_Cover_Raw_Data <- read_excel("Spring 2020 - Percent Cover - Raw Data DNET.xlsx", sheet = "Sheet1", col_names = FALSE)
+Spring_2020_raw <- read_excel("Spring 2020 - Percent Cover - Raw Data DNET.xlsx", sheet = "Sheet1", col_names = FALSE)
+Spring_2021_raw <- read_excel("Spring 2021 - Percent Cover - Raw Data DNET.xlsx", sheet = "Sheet1", col_names = FALSE)
+Spring_2022_raw <- read_excel("Spring 2022 - Percent Cover - Raw Data DNET.xlsx", 
+    sheet = "Sheet1", col_names = FALSE)
 
-glimpse(Spring_2020_Percent_Cover_Raw_Data)
+Spring_Data_raw <- bind_rows(Spring_2020_raw, Spring_2021_raw, Spring_2022_raw)
+
+
 ```
 
-Name columns after a row
 ```{r}
-Spring_2020_Percent_Cover_Raw_Data <- Spring_2020_Percent_Cover_Raw_Data %>% row_to_names(row_number(1))
+Spring_Data_raw <- Spring_Data_raw %>% row_to_names(row_number(1)) %>% 
+  rename(Transect = `Transect #`,  Hits = `# Hits`) %>% 
+  filter(Date != "Date" & Date != "mm/dd/yy")
+  
+
 ```
 
 
-Rename Col Names
-```{r}
-Spring_2020_Percent_Cover_Raw_Data <- Spring_2020_Percent_Cover_Raw_Data %>%  rename(Transect = `Transect #`,  Hits = `# Hits`)
-```
+
 
 
 ```{r}
