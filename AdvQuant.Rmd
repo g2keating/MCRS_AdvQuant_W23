@@ -50,3 +50,7 @@ Spring_Data_raw <- Spring_Data_raw %>% row_to_names(row_number(1)) %>%
 CodeCategories <- unique(Spring_Data_raw$Code)
 ```
 
+#create a file of unique species codes to be corrected
+```{r}
+Spring_Data_raw$Code %>% unique() %>% sort() %>% write.csv(file = "DNCodes.csv")
+```
