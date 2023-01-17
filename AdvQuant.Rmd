@@ -67,11 +67,12 @@ Spring_Data_raw <- Spring_Data_raw %>%
 
 
 
-
+# Standardize Code Names
 ```{r}
-print("This is a test")
-## hello this is Emma
-## another test
-## hello, the earth is round
+CodeCategories <- unique(Spring_Data_raw$Code)
 ```
 
+#create a file of unique species codes to be corrected
+```{r}
+Spring_Data_raw$Code %>% unique() %>% sort() %>% write.csv(file = "DNCodes.csv")
+```
