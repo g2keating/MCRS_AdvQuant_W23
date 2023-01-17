@@ -37,11 +37,33 @@ Spring_Data_raw <- bind_rows(Spring_2020_raw, Spring_2021_raw, Spring_2022_raw)
 ```{r}
 Spring_Data_raw <- Spring_Data_raw %>% row_to_names(row_number(1)) %>% 
   rename(Transect = `Transect #`,  Hits = `# Hits`) %>% 
-  filter(Date != "Date" & Date != "mm/dd/yy")
-  
+  filter(Date != "Date" & Date != "mm/dd/yy" & Date != "NA")
 
 ```
 
+
+Make columns correct factors 
+```{r}
+Spring_Data_raw <- Spring_Data_raw %>% 
+  mutate(Block = factor(Block)) %>% 
+  mutate(Plot = factor(Plot)) %>% 
+  mutate(Treatment = factor(Treatment)) %>% 
+  mutate(Region = factor(Region)) %>% 
+  mutate(Transect = as.numeric(Transect)) %>% 
+  mutate(Distance = as.numeric(Distance)) 
+
+
+Spring_Data_raw <- Spring_Data_raw %>% 
+  mutate(Date = as.numeric(Date)) %>% 
+  mutate(Date = as.Date(Date, format="%m/%d/%Y", origin = "1970-01-01"))
+
+Spring_Data_raw <- Spring_Data_raw %>% 
+  mutate(Date = as.numeric(Date)) 
+
+Spring_Data_raw <- Spring_Data_raw %>% 
+  mutate(Date = as.Date(Date, origin = "1970-01-01"))
+ 
+```
 
 
 
