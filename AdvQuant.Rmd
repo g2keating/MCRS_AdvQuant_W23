@@ -54,10 +54,6 @@ Spring_Data_raw <- Spring_Data_raw %>%
 
 
 Spring_Data_raw <- Spring_Data_raw %>% 
-  mutate(Date = as.numeric(Date)) %>% 
-  mutate(Date = as.Date(Date, format="%m/%d/%Y", origin = "1970-01-01"))
-
-Spring_Data_raw <- Spring_Data_raw %>% 
   mutate(Date = as.numeric(Date)) 
 
 Spring_Data_raw <- Spring_Data_raw %>% 
