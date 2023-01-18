@@ -1,16 +1,13 @@
 ---
-
-title: "Untitled"
+title: "Droughtnet Group 3"
+authors: "Priscilla, Garrett & Emma"
 output: html_document
-date: "2023-01-10"
+date: "2023-01-17"
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-
-Load Packages
+# Install and Load Packages
 ```{r}
 install.packages("tidyverse")
 install.packages("readxl")
@@ -19,30 +16,26 @@ install.packages("janitor")
 library(tidyverse)
 library(readxl)
 library(janitor)
-
+library(dplyr)
 ```
-
-Import Data
+# Import data and bind years
 ```{r}
 Spring_2020_raw <- read_excel("Spring 2020 - Percent Cover - Raw Data DNET.xlsx", sheet = "Sheet1", col_names = FALSE)
 Spring_2021_raw <- read_excel("Spring 2021 - Percent Cover - Raw Data DNET.xlsx", sheet = "Sheet1", col_names = FALSE)
 Spring_2022_raw <- read_excel("Spring 2022 - Percent Cover - Raw Data DNET.xlsx", 
     sheet = "Sheet1", col_names = FALSE)
 
+New_Codes <- read_csv("DNCodes.csv", show_col_types = FALSE)
+
 Spring_Data_raw <- bind_rows(Spring_2020_raw, Spring_2021_raw, Spring_2022_raw)
-
-
 ```
-
+# Rename columns and filter dates
 ```{r}
 Spring_Data_raw <- Spring_Data_raw %>% row_to_names(row_number(1)) %>% 
   rename(Transect = `Transect #`,  Hits = `# Hits`) %>% 
   filter(Date != "Date" & Date != "mm/dd/yy" & Date != "NA")
-
 ```
-
-
-Make columns correct factors 
+# Change column types
 ```{r}
 Spring_Data_raw <- Spring_Data_raw %>% 
   mutate(Block = factor(Block)) %>% 
@@ -52,24 +45,62 @@ Spring_Data_raw <- Spring_Data_raw %>%
   mutate(Transect = as.numeric(Transect)) %>% 
   mutate(Distance = as.numeric(Distance)) 
 
-
 Spring_Data_raw <- Spring_Data_raw %>% 
   mutate(Date = as.numeric(Date)) 
 
 Spring_Data_raw <- Spring_Data_raw %>% 
   mutate(Date = as.Date(Date, origin = "1899-12-30"))
- 
 ```
-
-
-
 # Standardize Code Names
 ```{r}
+## Create a list of unique codes in the "Code" column.
+
 CodeCategories <- unique(Spring_Data_raw$Code)
-
 ```
-
-#create a file of unique species codes to be corrected
+# Create a file of unique species codes to be corrected
 ```{r}
 Spring_Data_raw$Code %>% unique() %>% sort() %>% write.csv(file = "DNCodes.csv")
 ```
+# Change existing codes table to match new DNCodes.csv
+```{r}
+## Duplicate "Code" column so we can make code changes while still keeping the original codes for reference.
+Spring_Data_raw_newcol <- Spring_Data_raw %>%         
+  mutate(New_Code = Code)
+glimpse(Spring_Data_raw_newcol)
+
+# Standardized codes using the "New_Code" column. 
+Updated_Spring_Data <- Spring_Data_raw_newcol %>% 
+  mutate(New_Code = ifelse(as.character(New_Code) == "ARTICAL", "ARTCAL", as.character(New_Code)), 
+         New_Code = ifelse(as.character(New_Code) == "BROHUR", "BROHOR", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "ASCLEP SPP", "ASCSPP", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "BROSPC", "BROSPP", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "CENMEN", "CENMEL", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "D(ARTCAL)", "ARTCAL", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "D(BRANIG)", "BRANIG", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "D(ENCCAL)", "ENCCAL", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "D(ERIFAS)", "ERIFAS", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "D(EROSPP)", "EROSPP", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "D(UNK grass)", "UNK grass", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "D(UNK SPRAWLING BULB)", "UNK SPRAWLING BULB", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "DPL(ARTCAL)", "ARTCAL", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "DPL(ENCCAL)", "ENCCAL", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "DPL(SALMEL)", "SALMEL", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "DPL(STIPUL)", "STIPUL", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "EROFAS", "ERIFAS", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "EROSB", "EROSPP", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "EROSMOS", "EROMOS", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "FESMUE", "FESMYU", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "PHACELIA CILIATA", "PHACIL", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "PHACELIA SPP", "PHASPP", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "PICCEH", "PICECH", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "PIRECH", "PICECH", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "SILENESPP", "SILSPP", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "SOLAM? SPP.", "SOLSPP", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "T", "TH", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "V(ARTCAL)", "ARTCAL", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "V(ENCCAL)", "ENCCAL", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "V(ERIFAS)", "ERIFAS", as.character(New_Code)),
+         New_Code = ifelse(as.character(New_Code) == "PHACELIA SPP", "PHASPP", as.character(New_Code)))
+
+```
+
