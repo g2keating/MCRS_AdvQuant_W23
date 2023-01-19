@@ -103,10 +103,11 @@ Updated_Spring_Data <- Spring_Data_raw_newcol %>%
          New_Code = ifelse(as.character(New_Code) == "V(ENCCAL)", "ENCCAL", as.character(New_Code)),
          New_Code = ifelse(as.character(New_Code) == "V(ERIFAS)", "ERIFAS", as.character(New_Code)),
          New_Code = ifelse(as.character(New_Code) == "PHACELIA SPP", "PHASPP", as.character(New_Code)))
-
 ```
+
 ```{r}
 #import DNCodes and Species Key
+
 
 #names() function provides you the column names of your dataframe of interest
 names(Full_Species_List_Glossary_reference_only)
@@ -134,23 +135,20 @@ Lifeform = case_when( #this column came in from our SpecieKey and is more comple
 is.na(LifeForm) == FALSE ~ LifeForm, #when the version from DNCodes has a value, substitute in that value to the more complete column
 TRUE ~ as.character(lifeform))), #if there is something there (true), then just keep the old lifeform as a character
 
-
 CommonName = case_when(
 SpeciesCode == "L" ~ "litter",
 SpeciesCode == "B" ~ "bare ground",
 SpeciesCode == "W" ~ "coarse woody debris",
-SpeciesCpde == "F" ~ fine woody debris",
+SpeciesCpde == "F" ~ "fine woody debris",
 SpeciesCode == "R" ~ "rock",
-SpeciesCode == "S" ~ stem,
+SpeciesCode == "S" ~ "stem",
 SpeciesCode == "T" ~ "thatch",
 TRUE ~ as.character(CommonName)),
 
 SciName = case_when(
 Type == "Ground" ~ CommonName,
 TRUE ~ as.character(CommonName))
-)
-) %>%
-select(-Code) #delete old code column with erroneous codes
+)) %>% select(-Code) #delete old code column with erroneous codes
 
 #fill() takes value from row above to fill in the missing row of data
 #in cases where one cell needs to be changed, then filter by every single column or substitute a data value (google the function)
