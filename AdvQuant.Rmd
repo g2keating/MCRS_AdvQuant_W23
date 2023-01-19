@@ -170,5 +170,11 @@ Spring_Data_raw %>% filter(is.na(Transect) == TRUE)
 Spring_Data_raw %>% fill(Transect)
 ```
 
-#To-do:
-##Hits - need to replace NAs to 1; because each species was hit at least once
+#Data Sleuthing - Hits
+```{R}
+Spring_Data_raw$Hits %>% unique ()
+Spring_Data_raw %>% filter(is.na(Hits) == TRUE)
+#Hits - need to replace NAs to 1; because each species was hit at least once
+Spring_Data_raw <- Spring_Data_raw %>%
+  mutate(Hits = coalesce(Hits,1))
+```
