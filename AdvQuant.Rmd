@@ -132,7 +132,7 @@ SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>%
 #case_when() can be thought of as if else or if then statement
 
 Intermediate <- Spring_Data_raw %>% 
-  filter(is.na(Date) == FALSE) %>% #<= means filter for instances where Date is NA because NA is recognized as a completely empty cell in numeric/date columns
+  filter(is.na(Date) == FALSE) %>% #<= means filter for instances where Date is not NA because NA is recognized as a completely empty cell in numeric/date columns; a TRUE statement would mean that we filter for instances where Date is NA
   full_join(DNCodes, by = "Code") %>% 
   left_join(SpeciesKey, by = "SpeciesCode") %>% 
   mutate(
