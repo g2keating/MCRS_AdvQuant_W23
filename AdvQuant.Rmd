@@ -61,6 +61,7 @@ CodeCategories <- unique(Spring_Data_raw$Code)
 ```{r}
 Spring_Data_raw$Code %>% unique() %>% sort() %>% write.csv(file = "DNCodes.csv")
 ```
+
 # Change existing codes table to match new DNCodes.csv
 ```{r}
 ## Duplicate "Code" column so we can make code changes while still keeping the original codes for reference.
