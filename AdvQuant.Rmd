@@ -119,13 +119,13 @@ SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>%
 ```
 
 ```{r}
-<<<<<<< HEAD
+
 #Garrett's neat code
 Intermediate <- Spring_Data_raw %>% 
   filter(is.na(Date == TRUE)) %>%
-=======
+
 Intermediate <- Spring_Data_raw %>% 
->>>>>>> 2f6b2d693dcc7ceca270141b922c47a13247fe77
+
   full_join(DNCodes, by = "Code") %>% 
   left_join(SpeciesKey, by = "SpeciesCode") %>% 
   mutate(
@@ -139,22 +139,17 @@ Intermediate <- Spring_Data_raw %>%
       SpeciesCode == "W" ~ "coarse woody debris",
       SpeciesCode == "F" ~ "fine woody debris",
       SpeciesCode == "R" ~ "rock",
-<<<<<<< HEAD
       SpeciesCode == "S" ~ "stem",
       SpeciesCode == "T" ~ "thatch",
       TRUE ~ as.character(CommonName)),
-=======
       SpeciesCode == "S" ~ "Stem",
       SpeciesCode == "T" ~ "thatch",
-      True ~ as.character(CommonName)
-    ),
->>>>>>> 2f6b2d693dcc7ceca270141b922c47a13247fe77
+      True ~ as.character(CommonName)),
     
     SciName = case_when(
     Type == "Ground" ~ CommonName,
     TRUE ~ as.character(CommonName)
-    )
-    ) %>% 
+    )) %>% 
   select(-Code)
   Fill(Transect)
 
