@@ -120,7 +120,37 @@ SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>%
 ```
 
 
+```{r}
+Intermiediate <- Spring_Data_raw %>% 
+  full_join(DNCodes, by = "Code") %>% 
+  left_join(SpeciesKey, by = "SpeciesCode") %>% 
+  mutate(
+    Lifeform = case_when(
+          is.na(LifeForm) == FALSE  ~ LifeForm,
+          True ~ as.character(Lifeform)),
+    
+    CommonName = case_when(
+      SpeciesCode == "L" ~ "litter"
+      SpeciesCode == "B" ~ "bare ground"
+      SpeciesCode == "W" ~ "coarse woody debris"
+      SpeciesCode == "F" ~ "fine woody debris"
+      SpeciesCode == "R" ~ "rock"
+      SpeciesCode == "S" ~ "Stem"
+      SpeciesCode == "T" ~ "thatch"
+      True ~ as.character(CommonName)
+    ),
+    
+    SciName = case_when(
+    Type == "Ground" ~ CommonName,
+    True ~ as.character(SciName)
+    )
+    ) %>% 
+  select(-Code)
+  Fill(Transect)
 
+
+
+```
 
 
 ```{r}
