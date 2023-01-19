@@ -43,7 +43,8 @@ Spring_Data_raw <- Spring_Data_raw %>%
   mutate(Treatment = factor(Treatment)) %>% 
   mutate(Region = factor(Region)) %>% 
   mutate(Transect = as.numeric(Transect)) %>% 
-  mutate(Distance = as.numeric(Distance)) 
+  mutate(Distance = as.numeric(Distance)) %>%
+  mutate(Hits = as.numeric(Hits))
 
 Spring_Data_raw <- Spring_Data_raw %>% 
   mutate(Date = as.numeric(Date)) 
@@ -51,6 +52,7 @@ Spring_Data_raw <- Spring_Data_raw %>%
 Spring_Data_raw <- Spring_Data_raw %>% 
   mutate(Date = as.Date(Date, origin = "1899-12-30"))
 ```
+
 # Standardize Code Names
 ```{r}
 ## Create a list of unique codes in the "Code" column.
@@ -61,7 +63,6 @@ CodeCategories <- unique(Spring_Data_raw$Code)
 ```{r}
 Spring_Data_raw$Code %>% unique() %>% sort() %>% write.csv(file = "DNCodes.csv")
 ```
-
 # Change existing codes table to match new DNCodes.csv
 ```{r}
 ## Duplicate "Code" column so we can make code changes while still keeping the original codes for reference.
@@ -104,4 +105,56 @@ Updated_Spring_Data <- Spring_Data_raw_newcol %>%
          New_Code = ifelse(as.character(New_Code) == "PHACELIA SPP", "PHASPP", as.character(New_Code)))
 
 ```
+```{r}
+#import DNCodes and Species Key
 
+#names() function provides you the column names of your dataframe of interest
+names(Full_Species_List_Glossary_reference_only)
+
+SpeciesKey <- Full_species_List_Glossary_reference_only_ %>% select (1:7) %>% rename(SpeciesCode = `Species Code (A-Z)`, NativeStatus = `Native/Non-Native`, CommonName = `Common Name`, SciName = `Full Scientific Name (Genus species)`)
+
+#check for errors using unique funciton
+Spring_data_raw$Date %>% unique()
+
+Spring_data_raw %>% filter(is.na(Date) == TRUE)
+##NA means cell is completely blank so need to filter differently, as opposed to filter (Date == NA)
+
+Spring_data_raw %>%(is.na(Date) == FALSE)
+##above function removes all instances of which date is NA
+
+#join() function match columns across dataframes
+#we are using full join because all codes are present (DNCodes and raw dataset)
+#we are using left/right join because not all codes are present (raw dataset and species glossary); left join means keep original data (on left side of argument) that gets piped in, but not the data added after on the right
+#case_when means if then or if else statement
+intermediate <- Spring_data_raw %>% filter(is.na(Date == TRUE)) %>% 
+full_join (DNCodes, by ="Code") %>% 
+left_join(SpeciesKey, by = "SpeciesCode") %>%
+mutate(
+Lifeform = case_when( #this column came in from our SpecieKey and is more complete
+is.na(LifeForm) == FALSE ~ LifeForm, #when the version from DNCodes has a value, substitute in that value to the more complete column
+TRUE ~ as.character(lifeform))), #if there is something there (true), then just keep the old lifeform as a character
+
+
+CommonName = case_when(
+SpeciesCode == "L" ~ "litter",
+SpeciesCode == "B" ~ "bare ground",
+SpeciesCode == "W" ~ "coarse woody debris",
+SpeciesCpde == "F" ~ fine woody debris",
+SpeciesCode == "R" ~ "rock",
+SpeciesCode == "S" ~ stem,
+SpeciesCode == "T" ~ "thatch",
+TRUE ~ as.character(CommonName)),
+
+SciName = case_when(
+Type == "Ground" ~ CommonName,
+TRUE ~ as.character(CommonName))
+)
+) %>%
+select(-Code) #delete old code column with erroneous codes
+
+#fill() takes value from row above to fill in the missing row of data
+#in cases where one cell needs to be changed, then filter by every single column or substitute a data value (google the function)
+fill(Transect)
+
+#need to replace NAs in Hits to at least 1 because they hit the species once
+```
