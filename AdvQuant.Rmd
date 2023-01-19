@@ -105,6 +105,24 @@ Updated_Spring_Data <- Spring_Data_raw_newcol %>%
          New_Code = ifelse(as.character(New_Code) == "PHACELIA SPP", "PHASPP", as.character(New_Code)))
 
 ```
+
+
+```{r}
+Full_Species_List_Glossary_reference_only_ <- read_excel("Full Species List Glossary (reference only).xlsx")
+DNCodes <- read_csv("DNCodes.csv")
+
+SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>% 
+  select(1:7) %>% 
+  rename(SpeciesCode = 'Species Code (A-Z)',
+         NativeStatus = 'Native/Non-Native',
+         CommonName = 'Common Name',
+         SciName = 'Full Scientific Name (Genus species)')
+```
+
+
+
+
+
 ```{r}
 #import DNCodes and Species Key
 
