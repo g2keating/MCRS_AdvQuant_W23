@@ -105,6 +105,56 @@ Updated_Spring_Data <- Spring_Data_raw_newcol %>%
          New_Code = ifelse(as.character(New_Code) == "PHACELIA SPP", "PHASPP", as.character(New_Code)))
 ```
 
+<<<<<<< HEAD
+=======
+
+```{r}
+Full_Species_List_Glossary_reference_only_ <- read_excel("Full Species List Glossary (reference only).xlsx")
+DNCodes <- read_csv("DNCodes.csv")
+
+SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>% 
+  select(1:7) %>% 
+  rename(SpeciesCode = 'Species Code (A-Z)',
+         NativeStatus = 'Native/Non-Native',
+         CommonName = 'Common Name',
+         SciName = 'Full Scientific Name (Genus species)')
+```
+
+
+```{r}
+Intermiediate <- Spring_Data_raw %>% 
+  full_join(DNCodes, by = "Code") %>% 
+  left_join(SpeciesKey, by = "SpeciesCode") %>% 
+  mutate(
+    Lifeform = case_when(
+          is.na(LifeForm) == FALSE  ~ LifeForm,
+          True ~ as.character(Lifeform)),
+    
+    CommonName = case_when(
+      SpeciesCode == "L" ~ "litter"
+      SpeciesCode == "B" ~ "bare ground"
+      SpeciesCode == "W" ~ "coarse woody debris"
+      SpeciesCode == "F" ~ "fine woody debris"
+      SpeciesCode == "R" ~ "rock"
+      SpeciesCode == "S" ~ "Stem"
+      SpeciesCode == "T" ~ "thatch"
+      True ~ as.character(CommonName)
+    ),
+    
+    SciName = case_when(
+    Type == "Ground" ~ CommonName,
+    True ~ as.character(SciName)
+    )
+    ) %>% 
+  select(-Code)
+  Fill(Transect)
+
+
+
+```
+
+
+>>>>>>> d5d3972144970db3291fee6af9abf3910a680fa9
 ```{r}
 #import DNCodes and Species Key
 
