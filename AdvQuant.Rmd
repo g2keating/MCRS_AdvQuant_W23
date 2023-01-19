@@ -121,7 +121,7 @@ SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>%
          SciName = 'Full Scientific Name (Genus species)')
 ```
 
-#Garrett's new code 2.0 with Priscilla's notes from class - Create an intermediate file 
+#Garrett's new code 2.0 with Priscilla's notes from class - Create an INTERMEDIATE file that will be the MOST UPDATED working file
 ```{r}
 #join() function will match columns across dataframes - options: full, left, right; essentially this would move us in the same direction as what Excel's vlookup function does
 
@@ -132,7 +132,7 @@ SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>%
 #case_when() can be thought of as if else or if then statement
 
 Intermediate <- Spring_Data_raw %>% 
-  filter(is.na(Date == TRUE)) %>% #<= means filter for instances where Date is NA because NA is recognized as a completely empty cell in numeric/date columns
+  filter(is.na(Date) == FALSE) %>% #<= means filter for instances where Date is NA because NA is recognized as a completely empty cell in numeric/date columns
   full_join(DNCodes, by = "Code") %>% 
   left_join(SpeciesKey, by = "SpeciesCode") %>% 
   mutate(
@@ -160,21 +160,20 @@ Intermediate <- Spring_Data_raw %>%
 #Data Sleuthing Flow - Example for Transect Column
 ```{R}
 #Find errors - identify unique values
-Spring_Data_raw$Transect %>% unique()
+Intermediate$Transect %>% unique()
 
 #There are NAs in the Transect column. Find NAs - filter data for when NA is true
-Spring_Data_raw %>% filter(is.na(Transect) == TRUE)
+Intermediate %>% filter(is.na(Transect) == TRUE)
 
 #After looking back at the raw data for this instance, we determine that the NA is a result of the observer not recording the transect value. We can easily see that it is supposed to match the value of data row above it
 #fill() will take the value from the data row above to populate the missing NA cell
-Spring_Data_raw %>% fill(Transect)
+Intermediate %>% fill(Transect)
 ```
 
 #Data Sleuthing - Hits
 ```{R}
-Spring_Data_raw$Hits %>% unique ()
-Spring_Data_raw %>% filter(is.na(Hits) == TRUE)
+Intermediate$Hits %>% unique ()
+Intermediate %>% filter(is.na(Hits) == TRUE)
 #Hits - need to replace NAs to 1; because each species was hit at least once
-Spring_Data_raw <- Spring_Data_raw %>%
-  mutate(Hits = coalesce(Hits,1))
+Intermediate %>% mutate(Hits = coalesce(Hits,1))
 ```
