@@ -148,12 +148,14 @@ Intermediate <- Spring_Data_raw %>%
       TRUE ~ as.character(CommonName)),
       SpeciesCode == "S" ~ "Stem",
       SpeciesCode == "T" ~ "thatch",
-      True ~ as.character(CommonName)),
+      True ~ as.character(CommonName)
+    ),
     
     SciName = case_when(
     Type == "Ground" ~ CommonName,
     TRUE ~ as.character(CommonName)
-    )) %>% 
+    )
+    ) %>% 
   select(-Code)
   Fill(Transect)
 
