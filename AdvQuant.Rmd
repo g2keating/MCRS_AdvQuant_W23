@@ -53,7 +53,7 @@ Spring_Data_raw <- Spring_Data_raw %>%
   mutate(Date = as.Date(Date, origin = "1899-12-30"))
 ```
 
-# Standardize Code Names - Manual method
+#Standardize Code Names - Manual method
 ```{r}
 ## Create a list of unique codes in the "Code" column.
 
@@ -154,7 +154,9 @@ Intermediate <- Spring_Data_raw %>%
     Type == "Ground" ~ CommonName,
     TRUE ~ as.character(CommonName)
     )) %>% 
-  select(-Code) #<=means delete original, erroneous "Code" column from spring_data_raw
+  select(-Code) %>% #<=means delete original, erroneous "Code" column from Intermediate file
+  select(-Notes) %>% #<= means delete useless "Notes" (useless notes and only NAs) column from Intermediate file
+  select(-LifeForm) #<= means delete "LifeForm" (only NAs) column from Intermediate file
 ```
 
 #Data Sleuthing Flow - Example for Transect Column
@@ -176,4 +178,11 @@ Intermediate$Hits %>% unique ()
 Intermediate %>% filter(is.na(Hits) == TRUE)
 #Hits - need to replace NAs to 1; because each species was hit at least once
 Intermediate %>% mutate(Hits = coalesce(Hits,1))
+```
+
+#To-Do - delete when complete
+```{R}
+##Check Date, Block, Plot, Treatment, Region, Distance for NAs or weird values
+##Consider renaming Treatments (E/A/I -> Exclusion/Ambient/Irrigation), Region (X/M -> Xeric/Mesic) to fully spelled out words?
+##Eventually, maybe not right now, we will need to calculate %cover (#species hits/#total hits possible/transect) and richness (#unique species/transect)
 ```
