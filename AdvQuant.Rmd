@@ -184,5 +184,4 @@ Intermediate %>% mutate(Hits = coalesce(Hits,1))
 ```{R}
 ##Check Date, Block, Plot, Treatment, Region, Distance for NAs or weird values
 ##Consider renaming Treatments (E/A/I -> Exclusion/Ambient/Irrigation), Region (X/M -> Xeric/Mesic) to fully spelled out words?
-##Eventually, maybe not right now, we will need to calculate %cover (#species hits/#total hits possible/transect) and richness (#unique species/transect)
 ```
