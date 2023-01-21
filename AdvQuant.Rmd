@@ -202,3 +202,10 @@ Intermediate$Type %>% unique()
 Intermediate %>% filter(is.na(Type) == TRUE)
 #completely missing species code data for a lot of 2020 data - was this not entered at all? No, it just didn't import properly and I have no idea how to solve this...
 ```
+
+#Data Sleuthing - SpeciesCode
+```{R}
+Intermediate$SpeciesCode %>% unique()
+Intermediate %>% filter(is.na(SpeciesCode) == TRUE)
+#completely missing species code data for a lot of 2020 data - was this not entered at all? No, it just didn't import properly and I have no idea how to solve this...
+```
