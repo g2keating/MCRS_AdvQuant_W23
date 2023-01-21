@@ -156,7 +156,10 @@ Intermediate <- Spring_Data_raw %>%
     )) %>% 
   select(-Code) %>% #<=means delete original, erroneous "Code" column from Intermediate file
   select(-Notes) %>% #<= means delete useless "Notes" (useless notes and only NAs) column from Intermediate file
-  select(-LifeForm) #<= means delete "LifeForm" (only NAs) column from Intermediate file
+  select(-LifeForm) %>% #<= means delete "LifeForm" (only NAs) column from Intermediate file
+  fill(Transect) %>% 
+  mutate(Hits = coalesce(Hits,1))
+  
 ```
 
 #Data Sleuthing Flow - Example for Transect Column
@@ -169,7 +172,7 @@ Intermediate %>% filter(is.na(Transect) == TRUE)
 
 #After looking back at the raw data for this instance, we determine that the NA is a result of the observer not recording the transect value. We can easily see that it is supposed to match the value of data row above it
 #fill() will take the value from the data row above to populate the missing NA cell
-Intermediate %>% fill(Transect)
+#solution = line 160
 ```
 
 #Data Sleuthing - Hits
@@ -177,10 +180,25 @@ Intermediate %>% fill(Transect)
 Intermediate$Hits %>% unique ()
 Intermediate %>% filter(is.na(Hits) == TRUE)
 #Hits - need to replace NAs to 1; because each species was hit at least once
-Intermediate %>% mutate(Hits = coalesce(Hits,1))
+#solution = line 161
 ```
 
-#To-Do - delete when complete
+#Data Sleuthing - Block
 ```{R}
-##Check Date, Block, Plot, Treatment, Region, Distance for NAs or weird values
+Intermediate$Block %>% unique()
+#no changes necessary
+```
+
+
+#Data Sleuthing - Plot
+```{R}
+Intermediate$Plot %>% unique()
+#no changes necessary
+```
+
+#Data Sleuthing - Type
+```{R}
+Intermediate$Type %>% unique()
+Intermediate %>% filter(is.na(Type) == TRUE)
+#completely missing species code data for a lot of 2020 data - was this not entered at all? No, it just didn't import properly and I have no idea how to solve this...
 ```
