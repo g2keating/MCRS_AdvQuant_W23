@@ -101,7 +101,7 @@ Intermediate <- Spring_Data_raw %>%
           is.na(LifeForm) == FALSE  ~ Lifeform, 
           TRUE ~ as.character(LifeForm)),
     
-    CommonName = case_when(
+    SpeciesCode = case_when(
       SpeciesCode == "L" ~ "litter",
       SpeciesCode == "B" ~ "bare ground",
       SpeciesCode == "W" ~ "coarse woody debris",
@@ -109,7 +109,7 @@ Intermediate <- Spring_Data_raw %>%
       SpeciesCode == "R" ~ "rock",
       SpeciesCode == "S" ~ "stem",
       SpeciesCode == "T" ~ "thatch",
-      TRUE ~ as.character(CommonName)
+      TRUE ~ as.character(SpeciesCode)
       ),
     
     SciName = case_when(
