@@ -33,7 +33,7 @@ Spring_Data_raw <- Spring_Data_raw %>% row_to_names(row_number(1)) %>%
   rename(Transect = `Transect #`,  Hits = `# Hits`) %>% 
   filter(Date != "Date" & Date != "mm/dd/yy" & Date != "NA")
 ```
-#Check for NA's and misinputed Data.
+#Check for NA's and misinputed Data. NA's fixed on Intermediate file
 ```{r}
 unique(Spring_Data_raw$Date)
 unique(Spring_Data_raw$Block)
@@ -45,18 +45,14 @@ Spring_Data_raw <- Spring_Data_raw %>%
   mutate(Distance = ifelse(as.numeric(Distance) == 53, 3, as.numeric(Distance)))
 unique(Spring_Data_raw$Distance)
 
-#Changing NA Transect to 1
-Spring_Data_raw <- Spring_Data_raw %>% 
-  mutate(Transect = replace_na(Transect, 1))
-unique(Spring_Data_raw$Transect)
-
-#NA Hits replaced with 1.
-Spring_Data_raw <- Spring_Data_raw %>% 
-  mutate(Hits = replace_na(Hits, 1))
-unique(Spring_Data_raw$Hits)
 ```
 #Change Column Types
 ```{r}
+Spring_Data_raw <- Spring_Data_raw %>%
+  mutate(Block = as.numeric(Block)) %>% 
+  mutate(Plot = as.numeric(Plot)) %>% 
+  mutate(Transect = as.numeric(Transect))
+
 Spring_Data_raw <- Spring_Data_raw %>% 
   mutate(Block = factor(Block)) %>% 
   mutate(Plot = factor(Plot)) %>% 
@@ -70,6 +66,7 @@ Spring_Data_raw <- Spring_Data_raw %>%
 ```
 # Standardize Code Names
 ## Create a file of unique species codes to be corrected
+###This below should be removed I think, broke my code -Garrett
 ```{r}
 Spring_Data_raw$Code %>% unique() %>% sort() %>% write.csv(file = "DNCodes.csv")
 ```
@@ -120,10 +117,7 @@ Intermediate <- Spring_Data_raw %>%
   select(-Code) %>%
   fill(Transect) %>%
   select(-Notes) %>%
-  select(-LifeForm)
- 
-  
-  
+  select(-LifeForm) %>% 
   mutate(Hits = coalesce(Hits,1))
 ```
 
