@@ -119,6 +119,9 @@ Intermediate <- Spring_Data_raw %>%
   select(-Notes) %>%
   select(-LifeForm) %>% 
   mutate(Hits = coalesce(Hits,1))
+
+Intermediate <- Intermediate %>%
+  mutate(Transect = factor(Transect))
 ```
 
 ```{r}
