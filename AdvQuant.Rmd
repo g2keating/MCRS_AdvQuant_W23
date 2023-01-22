@@ -25,8 +25,6 @@ Spring_2021_raw <- read_excel("Spring 2021 - Percent Cover - Raw Data DNET.xlsx"
 Spring_2022_raw <- read_excel("Spring 2022 - Percent Cover - Raw Data DNET.xlsx", 
     sheet = "Sheet1", col_names = FALSE)
 
-New_Codes <- read_csv("DNCodes.csv", show_col_types = FALSE)
-
 Spring_Data_raw <- bind_rows(Spring_2020_raw, Spring_2021_raw, Spring_2022_raw)
 ```
 # Rename columns and filter dates
@@ -35,41 +33,28 @@ Spring_Data_raw <- Spring_Data_raw %>% row_to_names(row_number(1)) %>%
   rename(Transect = `Transect #`,  Hits = `# Hits`) %>% 
   filter(Date != "Date" & Date != "mm/dd/yy" & Date != "NA")
 ```
-
-
-#Check for NA's and misinputed Data. Filter 
-#Distance of 53 was misinput, should be 3. Replaced.
-#NA Transect should be 1. Replaced. 
-#NA Hits replaced with 1. 
+#Check for NA's and misinputed Data.
 ```{r}
-Spring_Data_raw <- Spring_Data_raw %>% 
-  mutate(Block = as.numeric(Block)) %>% 
-  mutate(Plot = as.numeric(Plot)) %>% 
-  mutate(Transect = as.numeric(Transect)) %>% 
-  mutate(Hits = as.numeric(Hits))
-
 unique(Spring_Data_raw$Date)
 unique(Spring_Data_raw$Block)
 unique(Spring_Data_raw$Plot)
 unique(Spring_Data_raw$Treatment)
 
-
-
+#Distance of 53 is a wrong input, changing to 3
 Spring_Data_raw <- Spring_Data_raw %>% 
   mutate(Distance = ifelse(as.numeric(Distance) == 53, 3, as.numeric(Distance)))
 unique(Spring_Data_raw$Distance)
 
-
-
+#Changing NA Transect to 1
 Spring_Data_raw <- Spring_Data_raw %>% 
   mutate(Transect = replace_na(Transect, 1))
 unique(Spring_Data_raw$Transect)
-  
+
+#NA Hits replaced with 1.
 Spring_Data_raw <- Spring_Data_raw %>% 
   mutate(Hits = replace_na(Hits, 1))
 unique(Spring_Data_raw$Hits)
 ```
-
 #Change Column Types
 ```{r}
 Spring_Data_raw <- Spring_Data_raw %>% 
@@ -77,76 +62,26 @@ Spring_Data_raw <- Spring_Data_raw %>%
   mutate(Plot = factor(Plot)) %>% 
   mutate(Treatment = factor(Treatment)) %>% 
   mutate(Region = factor(Region)) %>% 
-  mutate(Transect = factor(Transect)) %>% 
+  mutate(Transect = as.numeric(Transect)) %>% 
   mutate(Distance = as.numeric(Distance)) %>%
   mutate(Hits = as.numeric(Hits)) %>% 
   mutate(Date = as.numeric(Date)) %>% 
   mutate(Date = as.Date(Date, origin = "1899-12-30"))
 ```
-
-#Standardize Code Names - Manual method
-```{r}
-## Create a list of unique codes in the "Code" column.
-
-CodeCategories <- unique(Spring_Data_raw$Code)
-```
-# Create a file of unique species codes to be corrected
+# Standardize Code Names
+## Create a file of unique species codes to be corrected
 ```{r}
 Spring_Data_raw$Code %>% unique() %>% sort() %>% write.csv(file = "DNCodes.csv")
 ```
-# Change existing codes table to match new DNCodes.csv - Manual Method
+#Importing Corrected Code file (DNCodes) and Species Glossary from Amy
 ```{r}
-## Duplicate "Code" column so we can make code changes while still keeping the original codes for reference.
-Spring_Data_raw_newcol <- Spring_Data_raw %>%         
-  mutate(New_Code = Code)
-glimpse(Spring_Data_raw_newcol)
-
-# Standardized codes using the "New_Code" column. 
-Updated_Spring_Data <- Spring_Data_raw_newcol %>% 
-  mutate(New_Code = ifelse(as.character(New_Code) == "ARTICAL", "ARTCAL", as.character(New_Code)), 
-         New_Code = ifelse(as.character(New_Code) == "BROHUR", "BROHOR", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "ASCLEP SPP", "ASCSPP", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "BROSPC", "BROSPP", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "CENMEN", "CENMEL", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "D(ARTCAL)", "ARTCAL", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "D(BRANIG)", "BRANIG", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "D(ENCCAL)", "ENCCAL", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "D(ERIFAS)", "ERIFAS", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "D(EROSPP)", "EROSPP", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "D(UNK grass)", "UNK grass", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "D(UNK SPRAWLING BULB)", "UNK SPRAWLING BULB", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "DPL(ARTCAL)", "ARTCAL", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "DPL(ENCCAL)", "ENCCAL", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "DPL(SALMEL)", "SALMEL", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "DPL(STIPUL)", "STIPUL", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "EROFAS", "ERIFAS", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "EROSB", "EROSPP", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "EROSMOS", "EROMOS", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "FESMUE", "FESMYU", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "PHACELIA CILIATA", "PHACIL", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "PHACELIA SPP", "PHASPP", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "PICCEH", "PICECH", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "PIRECH", "PICECH", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "SILENESPP", "SILSPP", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "SOLAM? SPP.", "SOLSPP", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "T", "TH", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "V(ARTCAL)", "ARTCAL", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "V(ENCCAL)", "ENCCAL", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "V(ERIFAS)", "ERIFAS", as.character(New_Code)),
-         New_Code = ifelse(as.character(New_Code) == "PHACELIA SPP", "PHASPP", as.character(New_Code)))
-```
-
-<<<<<<< HEAD
-=======
-#Importing Corrected DNCodes from Amy and Species Glossary
->>>>>>> fad6bd123e8d1f5c31c54388813891124ee55851
-```{r}
+intermediate <-
 Full_Species_List_Glossary_reference_only_ <- read_excel("Full Species List Glossary (reference only).xlsx")
 DNCodes <- read_csv("DNCodes.csv")
 
-#names() function will spit out column names of your dataset of interest
 names(Full_Species_List_Glossary_reference_only_)
 
+#Renaming columns
 SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>% 
   select(1:7) %>% 
   rename(SpeciesCode = 'Species Code (A-Z)',
@@ -154,34 +89,17 @@ SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>%
          CommonName = 'Common Name',
          SciName = 'Full Scientific Name (Genus species)')
 ```
-
-#Garrett's new code 2.0 with Priscilla's notes from class - Create an INTERMEDIATE file that will be the MOST UPDATED working file
+#Create a new joined table (Intermediate) that will have the new standardized information
 ```{r}
-#join() function will match columns across dataframes - options: full, left, right; essentially this would move us in the same direction as what Excel's vlookup function does
 
-<<<<<<< HEAD
-#Garrett's neat code
-Intermediate <- Spring_Data_raw %>% 
-  filter(is.na(Date == TRUE))
-
-Intermediate <- Spring_Data_raw %>% 
-=======
-#For DN, use full join between DNCodes.csv and Spring_data_raw because both datafiles contain the same unique "Code" values. Ex. Spring_data_raw has "ARTICAL" and so will DNCodes.csv, along with another column (SpeciesCode) where "ARTICAL" is corrected to ARTCAL. This is because DNCodes was created from Spring_data_raw. This will address the issue of accounting for typos in the Spring_data_raw "Code" column and replacing with the corrected version found in the DNCodes.csv "SpeciesCode" column
-
-#In order to pull information about whether the lifeform (grass, shrub, forb, etc.), status (native, non-native), this is where we would have to join the Species Key to the Spring_Data_raw by, once again, matching values based on how the SpeciesCode column is populated. We do this using a left join between Species Key and Spring_data_raw. We do not use a full join here because that would entail including all the extraneous species present in Species Key, but not actually encountered in real life/in the Spring_data_raw file. To decide whether you want to conduct a left or right join depends on which side of the argument (data) that you want to keep. A left join keeps the data on the left side of the argument that gets piped in, but not the data added afterwards on the right
-
-#case_when() can be thought of as if else or if then statement
-
-Intermediate <- Spring_Data_raw %>% 
-  filter(is.na(Date) == FALSE) %>% #<= means filter for instances where Date is not NA because NA is recognized as a completely empty cell in numeric/date columns; a TRUE statement would mean that we filter for instances where Date is NA
-
-
+Intermediate <- Spring_Data_raw %>%
+  filter(is.na(Date) == FALSE) %>%
   full_join(DNCodes, by = "Code") %>% 
   left_join(SpeciesKey, by = "SpeciesCode") %>% 
   mutate(
     LifeForm = case_when(
           is.na(LifeForm) == FALSE  ~ Lifeform, 
-          TRUE ~ as.character(LifeForm)), #<= means if cell is populated with value, then keep the old value as a character
+          TRUE ~ as.character(LifeForm)),
     
     CommonName = case_when(
       SpeciesCode == "L" ~ "litter",
@@ -191,53 +109,44 @@ Intermediate <- Spring_Data_raw %>%
       SpeciesCode == "R" ~ "rock",
       SpeciesCode == "S" ~ "stem",
       SpeciesCode == "T" ~ "thatch",
-      TRUE ~ as.character(CommonName)),
+      TRUE ~ as.character(CommonName)
+      ),
     
     SciName = case_when(
     Type == "Ground" ~ CommonName,
-    TRUE ~ as.character(CommonName)
+    TRUE ~ as.character(SciName)
     )
-    ) %>% 
-  select(-Code)
-  Fill(Transect)
-
-
-
-=======
-    )) %>% 
-  select(-Code) %>% #<=means delete original, erroneous "Code" column from Intermediate file
-  select(-Notes) %>% #<= means delete useless "Notes" (useless notes and only NAs) column from Intermediate file
-<<<<<<< HEAD
-  select(-LifeForm) #<= means delete "LifeForm" (only NAs) column from Intermediate file
->>>>>>> 8fb24d3b327f9b88bdbddcf0bca50d2500c4b0c1
-=======
-  select(-LifeForm) %>% #<= means delete "LifeForm" (only NAs) column from Intermediate file
-  fill(Transect) %>% 
-  mutate(Hits = coalesce(Hits,1))
+  ) %>%
+  select(-Code) %>%
+  fill(Transect) %>%
+  select(-Notes) %>%
+  select(-LifeForm)
+ 
   
->>>>>>> ad4df0ecc8b29446a5188060f0299b74e87ccc48
+  
+  mutate(Hits = coalesce(Hits,1))
 ```
 
-<<<<<<< HEAD
 ```{r}
 #Priscilla's note-filled things
 
 #names() function provides you the column names of your dataframe of interest
 names(Full_Species_List_Glossary_reference_only)
-=======
-#Data Sleuthing Flow - Example for Transect Column
-```{R}
+
+```
+#More Data Sleuthing
+## Example for Transect Column
+```{r}
 #Find errors - identify unique values
 Intermediate$Transect %>% unique()
 
-#There are NAs in the Transect column. Find NAs - filter data for when NA is true
+#There are NAs in the Transect column. Find NAs (filter data for when NA is true).
 Intermediate %>% filter(is.na(Transect) == TRUE)
 
 #After looking back at the raw data for this instance, we determine that the NA is a result of the observer not recording the transect value. We can easily see that it is supposed to match the value of data row above it
 #fill() will take the value from the data row above to populate the missing NA cell
 #solution = line 160
 ```
-
 #Data Sleuthing - Hits
 ```{R}
 Intermediate$Hits %>% unique ()
@@ -245,28 +154,22 @@ Intermediate %>% filter(is.na(Hits) == TRUE)
 #Hits - need to replace NAs to 1; because each species was hit at least once
 #solution = line 161
 ```
-
 #Data Sleuthing - Block
 ```{R}
 Intermediate$Block %>% unique()
 #no changes necessary
 ```
-
-
 #Data Sleuthing - Plot
 ```{R}
 Intermediate$Plot %>% unique()
 #no changes necessary
 ```
->>>>>>> fad6bd123e8d1f5c31c54388813891124ee55851
-
 #Data Sleuthing - Type
 ```{R}
 Intermediate$Type %>% unique()
 Intermediate %>% filter(is.na(Type) == TRUE)
 #completely missing species code data for a lot of 2020 data - was this not entered at all? No, it just didn't import properly and I have no idea how to solve this...
 ```
-
 #Data Sleuthing - SpeciesCode
 ```{R}
 Intermediate$SpeciesCode %>% unique()
