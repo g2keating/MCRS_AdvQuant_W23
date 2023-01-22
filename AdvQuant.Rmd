@@ -35,7 +35,42 @@ Spring_Data_raw <- Spring_Data_raw %>% row_to_names(row_number(1)) %>%
   rename(Transect = `Transect #`,  Hits = `# Hits`) %>% 
   filter(Date != "Date" & Date != "mm/dd/yy" & Date != "NA")
 ```
-# Change column types
+
+
+#Check for NA's and misinputed Data. Filter 
+#Distance of 53 was misinput, should be 3. Replaced.
+#NA Transect should be 1. Replaced. 
+#NA Hits replaced with 1. 
+```{r}
+Spring_Data_raw <- Spring_Data_raw %>% 
+  mutate(Block = as.numeric(Block)) %>% 
+  mutate(Plot = as.numeric(Plot)) %>% 
+  mutate(Transect = as.numeric(Transect)) %>% 
+  mutate(Hits = as.numeric(Hits))
+
+unique(Spring_Data_raw$Date)
+unique(Spring_Data_raw$Block)
+unique(Spring_Data_raw$Plot)
+unique(Spring_Data_raw$Treatment)
+
+
+
+Spring_Data_raw <- Spring_Data_raw %>% 
+  mutate(Distance = ifelse(as.numeric(Distance) == 53, 3, as.numeric(Distance)))
+unique(Spring_Data_raw$Distance)
+
+
+
+Spring_Data_raw <- Spring_Data_raw %>% 
+  mutate(Transect = replace_na(Transect, 1))
+unique(Spring_Data_raw$Transect)
+  
+Spring_Data_raw <- Spring_Data_raw %>% 
+  mutate(Hits = replace_na(Hits, 1))
+unique(Spring_Data_raw$Hits)
+```
+
+#Change Column Types
 ```{r}
 Spring_Data_raw <- Spring_Data_raw %>% 
   mutate(Block = factor(Block)) %>% 
@@ -44,12 +79,8 @@ Spring_Data_raw <- Spring_Data_raw %>%
   mutate(Region = factor(Region)) %>% 
   mutate(Transect = factor(Transect)) %>% 
   mutate(Distance = as.numeric(Distance)) %>%
-  mutate(Hits = as.numeric(Hits))
-
-Spring_Data_raw <- Spring_Data_raw %>% 
-  mutate(Date = as.numeric(Date)) 
-
-Spring_Data_raw <- Spring_Data_raw %>% 
+  mutate(Hits = as.numeric(Hits)) %>% 
+  mutate(Date = as.numeric(Date)) %>% 
   mutate(Date = as.Date(Date, origin = "1899-12-30"))
 ```
 
