@@ -113,7 +113,9 @@ Intermediate <- Spring_Data_raw %>%
   fill(Transect) %>%
   select(-Notes) %>%
   select(-LifeForm) %>% 
-  mutate(Hits = coalesce(Hits,1))
+  mutate(Hits = coalesce(Hits,1)) %>%
+  mutate(Status = ifelse(is.na(Status),"Ground",Status)) %>%
+  mutate(NativeStatus = ifelse(is.na(NativeStatus), "Ground", NativeStatus))
 
 Intermediate <- Intermediate %>%
   mutate(Transect = factor(Transect))
@@ -165,4 +167,20 @@ Intermediate[7097,10] <- UNK #replace NA found in species code in row 9097 with 
 Intermediate$Type %>% unique()
 Intermediate %>% filter(is.na(Type) == TRUE)
 #lots of NAs, likely as a result of many NAs in the SpeciesCode column
+```
+
+#Data Sleuthing - Status
+```{R}
+Intermediate$Status %>% unique()
+Intermediate %>% filter(is.na(Status) == TRUE)
+#NAs are a result of groundcover categories not populating with a plant status, so changed all the NAs to ground
+#solution=line 117; mutate(Status = ifelse(is.na(Status),"Ground",Status)
+```
+
+#Data Sleuthing - NativeStatus
+```{R}
+Intermediate$NativeStatus %>% unique()
+Intermediate %>% filter(is.na(NativeStatus) == TRUE)
+#NAs are a result of groundcover categories not populating with a plant status, so changed all the NAs to ground
+#solution=line 118; mutate(Status = ifelse(is.na(Status),"Ground",Status)
 ```
