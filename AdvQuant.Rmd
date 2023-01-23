@@ -156,6 +156,8 @@ Intermediate$SpeciesCode %>% unique()
 #missing a lot of species code data for 2020 and 2022 which will impact how Type, Status, SciName, Lifeform, Native Status, CommonName, old names, and Plant family will appear
 
 #For 2022 - NAs due to entry error (did not enter speciescode) AND observer error (did not record ground cover for block 2 plot 8); easiest fix would probably revising the excel file itself
+
+Intermediate[7097,10] <- UNK #replace NA found in species code in row 9097 with UNK
 ```
 
 #Data Sleuthing - Type
