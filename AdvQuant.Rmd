@@ -105,8 +105,13 @@ Intermediate <- Spring_Data_raw %>%
       ),
     
     SciName = case_when(
-    Type == "Ground" ~ CommonName,
+    Type == "Ground" ~ SpeciesCode,
     TRUE ~ as.character(SciName)
+    ),
+    
+    CommonName = case_when(
+      Type == "Ground" ~ SpeciesCode,
+      TRUE ~ as.character(CommonName)
     )
   ) %>%
   select(-Code) %>%
