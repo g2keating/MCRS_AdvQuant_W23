@@ -29,10 +29,11 @@ Spring_Data_raw <- bind_rows(Spring_2020_raw, Spring_2021_raw, Spring_2022_raw)
 ```
 # Rename columns and filter dates
 ```{r}
-Spring_Data_raw <- Spring_Data_raw %>% row_to_names(row_number(1)) %>% 
+Spring_Data_raw <- Spring_Data_raw %>% row_to_names(row_number(2)) %>% 
   rename(Transect = `Transect #`,  Hits = `# Hits`) %>% 
   filter(Date != "Date" & Date != "mm/dd/yy" & Date != "NA")
 ```
+
 #Check for NA's and misinputed Data. NA's fixed on Intermediate file
 ```{r}
 unique(Spring_Data_raw$Date)
@@ -64,15 +65,9 @@ Spring_Data_raw <- Spring_Data_raw %>%
   mutate(Date = as.numeric(Date)) %>% 
   mutate(Date = as.Date(Date, origin = "1899-12-30"))
 ```
-# Standardize Code Names
-## Create a file of unique species codes to be corrected
-###This below should be removed I think, broke my code -Garrett
-```{r}
-Spring_Data_raw$Code %>% unique() %>% sort() %>% write.csv(file = "DNCodes.csv")
-```
+
 #Importing Corrected Code file (DNCodes) and Species Glossary from Amy
 ```{r}
-intermediate <-
 Full_Species_List_Glossary_reference_only_ <- read_excel("Full Species List Glossary (reference only).xlsx")
 DNCodes <- read_csv("DNCodes.csv")
 
@@ -124,13 +119,6 @@ Intermediate <- Intermediate %>%
   mutate(Transect = factor(Transect))
 ```
 
-```{r}
-#Priscilla's note-filled things
-
-#names() function provides you the column names of your dataframe of interest
-names(Full_Species_List_Glossary_reference_only)
-
-```
 #More Data Sleuthing
 ## Example for Transect Column
 ```{r}
@@ -142,14 +130,14 @@ Intermediate %>% filter(is.na(Transect) == TRUE)
 
 #After looking back at the raw data for this instance, we determine that the NA is a result of the observer not recording the transect value. We can easily see that it is supposed to match the value of data row above it
 #fill() will take the value from the data row above to populate the missing NA cell
-#solution = line 160
+#solution = line 113; fill(Transect)
 ```
 #Data Sleuthing - Hits
 ```{R}
 Intermediate$Hits %>% unique ()
 Intermediate %>% filter(is.na(Hits) == TRUE)
 #Hits - need to replace NAs to 1; because each species was hit at least once
-#solution = line 161
+#solution = line 116; mutate(Hits = coalesce(Hits,1))
 ```
 #Data Sleuthing - Block
 ```{R}
@@ -161,15 +149,21 @@ Intermediate$Block %>% unique()
 Intermediate$Plot %>% unique()
 #no changes necessary
 ```
+
+#Data Sleuthing - SpeciesCode
+```{R}
+Intermediate$SpeciesCode %>% unique()
+#missing a lot of species code data for 2020 and 2022 which will impact how Type, Status, SciName, Lifeform, Native Status, CommonName, old names, and Plant family will appear
+
+#For 2020 - NAs due to "unk" plus extra space
+
+#For 2022 - NAs due to entry error (did not enter speciescode) AND observer error (did not record ground cover for block 2 plot 8); easiest fix would probably revising the excel file itself
+#2022 - B1P5Tx1Dis2 - replaced NA with UNK (NORCAL written on datasheet, but that is not a plant); B1P7Tx5Dis4.5+5 - replaced NA with L and B respectively
+```
+
 #Data Sleuthing - Type
 ```{R}
 Intermediate$Type %>% unique()
 Intermediate %>% filter(is.na(Type) == TRUE)
-#completely missing species code data for a lot of 2020 data - was this not entered at all? No, it just didn't import properly and I have no idea how to solve this...
-```
-#Data Sleuthing - SpeciesCode
-```{R}
-Intermediate$SpeciesCode %>% unique()
-Intermediate %>% filter(is.na(SpeciesCode) == TRUE)
-#completely missing species code data for a lot of 2020 data - was this not entered at all? No, it just didn't import properly and I have no idea how to solve this...
+#lots of NAs, likely as a result of many NAs in the SpeciesCode column
 ```
