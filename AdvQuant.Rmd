@@ -28,10 +28,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 # 1. Install and Load Packages
 ```{r}
-install.packages("tidyverse")
-install.packages("readxl")
-install.packages("janitor")
-
 library(tidyverse)
 library(readxl)
 library(janitor)
@@ -52,20 +48,8 @@ Spring_Data_raw <- Spring_Data_raw %>% row_to_names(row_number(2)) %>%
   rename(Transect = `Transect #`,  Hits = `# Hits`) %>% 
   filter(Date != "Date" & Date != "mm/dd/yy" & Date != "NA")
 ```
-# 4. Check for NA's and misinputed Data. NA's fixed on Intermediate file
-```{r}
-unique(Spring_Data_raw$Date)
-unique(Spring_Data_raw$Block)
-unique(Spring_Data_raw$Plot)
-unique(Spring_Data_raw$Treatment)
 
-#Distance of 53 is a wrong input, changing to 3
-Spring_Data_raw_better <- Spring_Data_raw %>% 
-  mutate(Distance = ifelse(as.numeric(Distance) == 53, 3, as.numeric(Distance)))
-unique(Spring_Data_raw$Distance)
-
-```
-# 5. Change Column Types
+# 4. Change Column Types
 ```{r}
 Spring_Data_raw <- Spring_Data_raw %>%
   mutate(Block = as.numeric(Block)) %>% 
@@ -83,6 +67,23 @@ Spring_Data_raw <- Spring_Data_raw %>%
   mutate(Date = as.numeric(Date)) %>% 
   mutate(Date = as.Date(Date, origin = "1899-12-30"))
 ```
+# 5. Check for NA's and misinputed Data. NA's fixed on Intermediate file
+```{r}
+unique(Spring_Data_raw$Date)
+unique(Spring_Data_raw$Block)
+unique(Spring_Data_raw$Plot)
+unique(Spring_Data_raw$Treatment)
+unique(Spring_Data_raw$Transect)
+unique(Spring_Data_raw$Hits)
+
+
+#Distance of 53 is a wrong input, changing to 3
+Spring_Data_raw <- Spring_Data_raw %>% 
+  mutate(Distance = ifelse(as.numeric(Distance) == 53, 3, as.numeric(Distance)))
+unique(Spring_Data_raw$Distance)
+
+```
+
 # 6. Importing Corrected Code file (DNCodes) and Species Glossary from Amy
 ```{r}
 Full_Species_List_Glossary_reference_only_ <- read_excel("Full Species List Glossary (reference only).xlsx")
@@ -178,7 +179,8 @@ Intermediate$SpeciesCode %>% unique()
 
 #For 2022 - NAs due to entry error (did not enter speciescode) AND observer error (did not record ground cover for block 2 plot 8); easiest fix would probably revising the excel file itself
 
-Intermediate[7097,10] <- UNK #replace NA found in species code in row 9097 with UNK
+Intermediate[7097,10] <- "UNK" #replace NA found in species code in row 9097 with UNK
+Intermediate[7097,11] <- "Plant" #replace NA found in Type in row 9097 with Plant
 ```
 # f. Data Sleuthing - Type
 ```{R}
