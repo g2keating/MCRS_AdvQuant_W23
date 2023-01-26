@@ -51,15 +51,22 @@ DN_PresAbs_Matrix <- DN_index %>%
 DN_diversity <- DN_PresAbs_Matrix %>% 
   mutate(SpRich = rowSums(across(where(is.numeric)), na.rm=TRUE))
          
+
+
+DN_diversity_index <- DN_diversity %>% 
+  select(Index, SpRich) %>% 
+  full_join(Transect_Index) %>%
+  select(Index, Date:Transect, SpRich)
+
+
 Transect_Index <- DN_index %>% 
   select(Date, Block:Transect, Index) %>%
   distinct()
 
-DN_diversity_index %>% select(Index, SpRich) %>%  
-  full_join(Transect_Index) %>% 
-  select(Index,Date:Transect, SpRich)
 
-
+DN_diversity_index %>% ggplot() +
+  aes(x=Treatment, y=SpRich, fill = Region) +
+  geom_boxplot()
 ```
 
 
