@@ -122,6 +122,7 @@ Convert Hits column to 0/1 (i.e., presence/absence), then sum for percent cover 
 ---Non-native
 ```{r}
 
+
 ```
 
 ## Calculate Rough Abundance with COUNTS OF HITS
@@ -134,9 +135,49 @@ Sum the count of hits for each TRANSECT for each Treatment and Seed Source combi
 -- LifeForm
 ---Native
 ---Non-native
-```{r}
 
+--percent cover =  present / total points
+cover dominance = hits / total points
+--percent cover =  present / total points
+cover dominance = hits / total points
+
+Calculate percent cover with presence/absence data
+1. convert our hits column in our original data to a 0/1 pres.absence column
+2. sum the observations per transect
+3. divide by the total number of observations in the transect (9)
+```{r}
+SpeciesPercentCover <- DN_index %>%
+  filter(Type == "Plant") %>%
+  select(Index, SpeciesCode, Hits) %>%
+  mutate(PresAbs = case_when(
+    Hits >= 1 ~ 1,
+    Hits <1 ~ 0
+  )) %>%
+  group_by(Index, SpeciesCode) %>%
+  summarize(PresAbsSum = sum(PresAbs)) %>%
+  mutate(PerCover = PresAbsSum/9) %>%
+  select(-PresAbsSum) %>%
+  pivot_wider(names_from = SpeciesCode, values_from = PerCover) %>%
+  replace(is.na(.), 0)
+  
 ```
 
+```{r}
+SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>% 
+  select(1:7) %>% 
+  rename(SpeciesCode = 'Species Code (A-Z)',
+         NativeStatus = 'Native/Non-Native',
+         CommonName = 'Common Name',
+         SciName = 'Full Scientific Name (Genus species)')
+
+SpeciesPercentCover %>% 
+  pivot_longer(2:ncol(SpeciesPercentCover), names_to = "SpeciesCode", values_to = "PerCover") %>%
+  left_join(SpeciesKey)
+
+occupancy - pres/9
+abudnace - hits/9
+relative abundance - hits/hits total
+  
+```
 
 
