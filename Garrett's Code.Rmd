@@ -52,7 +52,6 @@ DN_diversity <- DN_PresAbs_Matrix %>%
   mutate(SpRich = rowSums(across(where(is.numeric)), na.rm=TRUE))
          
 
-
 DN_diversity_index <- DN_diversity %>% 
   select(Index, SpRich) %>% 
   full_join(Transect_Index) %>%
