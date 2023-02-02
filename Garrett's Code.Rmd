@@ -52,6 +52,7 @@ DN_diversity <- DN_PresAbs_Matrix %>%
   mutate(SpRich = rowSums(across(where(is.numeric)), na.rm=TRUE))
          
 
+
 DN_diversity_index <- DN_diversity %>% 
   select(Index, SpRich) %>% 
   full_join(Transect_Index) %>%
@@ -61,7 +62,6 @@ DN_diversity_index <- DN_diversity %>%
 Transect_Index <- DN_index %>% 
   select(Date, Block:Transect, Index) %>%
   distinct()
-
 
 DN_diversity_index %>% ggplot() +
   aes(x=Treatment, y=SpRich, fill = Region) +
@@ -120,9 +120,46 @@ Convert Hits column to 0/1 (i.e., presence/absence), then sum for percent cover 
 -- LifeForm
 ---Native
 ---Non-native
+
+1. Convert our hits column in our original data to a 0/1 pres absence column
+2. sum the observations per transect
+3. divide by the total number of observations in the transect (9)
 ```{r}
+SpeciesPerCover <- DN_index %>% 
+  filter(Type == "Plant") %>% 
+  select(Index, SpeciesCode, Hits) %>% 
+  
+  mutate(PresAbs = case_when(
+    Hits >= 1 ~ 1, 
+    Hits < 1 ~ 0
+  )) %>% 
+
+  group_by(Index, SpeciesCode) %>% 
+  summarize(PresAbsSum = sum(PresAbs)) %>% 
+  
+  mutate(PerCover = PresAbsSum/9) %>% 
+  select(-PresAbsSum) %>% 
+  pivot_wider(names_from = SpeciesCode, values_from = PerCover) %>% 
+  
+  replace(is.na(.), 0)
 
 ```
+
+```{r}
+#Renaming columns
+SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>% 
+  select(1:7) %>% 
+  rename(SpeciesCode = 'Species Code (A-Z)',
+         NativeStatus = 'Native/Non-Native',
+         CommonName = 'Common Name',
+         SciName = 'Full Scientific Name (Genus species)')
+
+SpeciesPerCover %>% 
+  pivot_longer(2:ncol(SpeciesPerCover), names_to = "SpeciesCode", values_to = "PerCover") %>% 
+  left_join(Full_Species_List_Glossary_reference_only_, by)
+  
+```
+
 
 ## Calculate Rough Abundance with COUNTS OF HITS
 Sum the count of hits for each TRANSECT for each Treatment and Seed Source combination
