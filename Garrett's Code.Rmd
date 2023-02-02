@@ -154,10 +154,24 @@ SpeciesKey <- Full_Species_List_Glossary_reference_only_ %>%
          CommonName = 'Common Name',
          SciName = 'Full Scientific Name (Genus species)')
 
-SpeciesPerCover %>% 
+SpeciesPerCover <- SpeciesPerCover %>% 
   pivot_longer(2:ncol(SpeciesPerCover), names_to = "SpeciesCode", values_to = "PerCover") %>% 
-  left_join(Full_Species_List_Glossary_reference_only_, by)
-  
+  left_join(SpeciesKey)
+
+ 
+```
+
+```{r}
+NativePerCover <- SpeciesPerCover %>% 
+  filter(NativeStatus == "Native") %>% 
+  group_by(Index) %>% 
+  summarize(NativePerCover = sum(PerCover))
+
+NativePerCover 
+```
+
+```{r}
+DN_diversity_index %>% left_join(NativePerCover)
 ```
 
 
